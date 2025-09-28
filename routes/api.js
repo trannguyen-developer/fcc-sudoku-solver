@@ -86,6 +86,30 @@ module.exports = function (app) {
   });
 
   app.route("/api/solve").post((req, res) => {
-    return res.json({});
+    const { puzzle } = req.body;
+
+    if (!puzzle) {
+      return res.json({ error: "Required field missing" });
+    }
+
+    const regexValidPuzzle = /^[0-9.]+$/;
+    // check valid puzzle
+    if (!regexValidPuzzle.test(puzzle)) {
+      return res.json({ error: "Invalid characters in puzzle" });
+    }
+
+    // check length of puzzle is 81 characters
+    if (puzzle.length !== 81) {
+      return res.json({ error: "Expected puzzle to be 81 characters long" });
+    }
+
+    const isSolver = solver.solve(puzzle);
+    console.log("isSolver", isSolver);
+
+    if (!isSolver) {
+      return res.json({ error: "Puzzle cannot be solved" });
+    }
+
+    return res.json({ solution: isSolver });
   });
 };

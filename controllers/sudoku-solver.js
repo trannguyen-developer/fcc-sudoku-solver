@@ -7,14 +7,14 @@ class SudokuSolver {
   checkRowPlacement(puzzleString, row, column, value) {
     const valuesIndexOfRow = {
       A: [0, 9],
-      B: [10, 18],
-      C: [19, 27],
-      D: [28, 36],
-      E: [37, 45],
-      F: [46, 54],
-      G: [55, 63],
-      H: [64, 72],
-      I: [73, 81],
+      B: [9, 18],
+      C: [18, 27],
+      D: [27, 36],
+      E: [36, 45],
+      F: [45, 54],
+      G: [54, 63],
+      H: [63, 72],
+      I: [72, 81],
     };
 
     const valuesStringOfRow = puzzleString?.slice(...valuesIndexOfRow[row]);
@@ -118,6 +118,8 @@ class SudokuSolver {
 
     let isExistValueInRegion = false;
 
+    // console.log("currentRegion", currentRegion, row, column);
+
     for (let index = 0; index < currentRegion.length; index++) {
       if (currentRegion[index] === currentPlace) {
         continue;
@@ -125,7 +127,7 @@ class SudokuSolver {
 
       const indexOfPlace = placesMap[currentRegion[index]];
 
-      if (puzzleString?.[indexOfPlace] === value) {
+      if (String(puzzleString?.[indexOfPlace]) === String(value)) {
         isExistValueInRegion = true;
         break;
       }
@@ -134,7 +136,67 @@ class SudokuSolver {
     return isExistValueInRegion;
   }
 
-  solve(puzzleString) {}
+  validBox(puzzleString, row, column, value) {
+    const isExistRow = this.checkRowPlacement(puzzleString, row, column, value);
+    const isExistCol = this.checkColPlacement(puzzleString, row, column, value);
+    const isExistRegion = this.checkRegionPlacement(
+      puzzleString,
+      row,
+      column,
+      value
+    );
+
+    const result = !isExistRow && !isExistCol && !isExistRegion;
+    return result;
+  }
+
+  backTracking(board) {
+    const rowIndexToCharacter = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
+
+    for (let rowIndex = 0; rowIndex < board.length; rowIndex++) {
+      const row = board[rowIndex];
+      // console.log("row", row);
+
+      const rowCharacter = rowIndexToCharacter[rowIndex];
+      // console.log("rowCharacter", rowCharacter);
+
+      for (let colIndex = 0; colIndex < row.length; colIndex++) {
+        const col = row[colIndex];
+        if (col === ".") {
+          for (let valueIndex = 1; valueIndex <= 9; valueIndex++) {
+            const newBoard = board.flat().join("");
+            const isValid = this.validBox(
+              newBoard,
+              rowCharacter,
+              colIndex + 1,
+              valueIndex
+            );
+            if (isValid) {
+              board[rowIndex][colIndex] = String(valueIndex);
+              if (this.backTracking(board, newBoard)) return true;
+              board[rowIndex][colIndex] = ".";
+            }
+          }
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  solve(puzzleString) {
+    let board = Array.from({ length: 9 }, (_, r) =>
+      puzzleString?.slice(r * 9, r * 9 + 9).split("")
+    );
+
+    const isResolve = this.backTracking(board);
+    const result = board.flat().join("");
+
+    if (isResolve) {
+      return result;
+    }
+    return false;
+  }
 }
 
 module.exports = SudokuSolver;
