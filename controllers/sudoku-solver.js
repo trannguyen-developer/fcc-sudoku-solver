@@ -17,27 +17,31 @@ class SudokuSolver {
       I: [73, 81],
     };
 
-    const valuesStringOfRow = puzzleString.slice(...valuesIndexOfRow[row]);
+    const valuesStringOfRow = puzzleString?.slice(...valuesIndexOfRow[row]);
 
     const valuesStringOfRowWithoutValueColumn =
-      valuesStringOfRow.slice(0, column) + valuesStringOfRow.slice(column + 1);
+      valuesStringOfRow?.slice(0, column - 1) +
+      valuesStringOfRow?.slice(column);
 
-    const isExistValueInRow =
-      valuesStringOfRowWithoutValueColumn.includes(value);
+    const isExistValueInRow = (
+      valuesStringOfRowWithoutValueColumn || []
+    )?.includes(value);
 
     return isExistValueInRow;
   }
 
   checkColPlacement(puzzleString, row, column, value) {
-    const valueColumn1 = puzzleString.slice(column - 2, column - 1);
-    const valueColumn2 = puzzleString.slice(column + 7, column + 8);
-    const valueColumn3 = puzzleString.slice(column + 16, column + 17);
-    const valueColumn4 = puzzleString.slice(column + 25, column + 26);
-    const valueColumn5 = puzzleString.slice(column + 34, column + 35);
-    const valueColumn6 = puzzleString.slice(column + 43, column + 44);
-    const valueColumn7 = puzzleString.slice(column + 52, column + 53);
-    const valueColumn8 = puzzleString.slice(column + 61, column + 62);
-    const valueColumn9 = puzzleString.slice(column + 70, column + 71);
+    const columnInt = +column;
+
+    const valueColumn1 = puzzleString?.slice(columnInt - 1, columnInt - 0);
+    const valueColumn2 = puzzleString?.slice(columnInt + 8, columnInt + 9);
+    const valueColumn3 = puzzleString?.slice(columnInt + 17, columnInt + 18);
+    const valueColumn4 = puzzleString?.slice(columnInt + 26, columnInt + 27);
+    const valueColumn5 = puzzleString?.slice(columnInt + 35, columnInt + 36);
+    const valueColumn6 = puzzleString?.slice(columnInt + 44, columnInt + 45);
+    const valueColumn7 = puzzleString?.slice(columnInt + 53, columnInt + 54);
+    const valueColumn8 = puzzleString?.slice(columnInt + 62, columnInt + 63);
+    const valueColumn9 = puzzleString?.slice(columnInt + 71, columnInt + 72);
 
     const valuesStringOfCol =
       valueColumn1 +
@@ -49,6 +53,10 @@ class SudokuSolver {
       valueColumn7 +
       valueColumn8 +
       valueColumn9;
+
+    if (!valuesStringOfCol) {
+      return false;
+    }
 
     const rowToIndex = {
       A: 0,
@@ -63,9 +71,9 @@ class SudokuSolver {
     };
 
     const valuesStringOfColWithoutValueRow =
-      valuesStringOfCol.slice(0, rowToIndex[row]) +
-      valuesStringOfCol.slice(rowToIndex[row] + 1);
-    const isExistValueInCol = valuesStringOfColWithoutValueRow.includes(value);
+      valuesStringOfCol?.slice(0, rowToIndex[row]) +
+      valuesStringOfCol?.slice(+rowToIndex[row] + 1);
+    const isExistValueInCol = valuesStringOfColWithoutValueRow?.includes(value);
 
     return isExistValueInCol;
   }
@@ -103,7 +111,7 @@ class SudokuSolver {
     let currentRegion;
 
     for (const region in regions) {
-      if (regions[region].includes(currentPlace)) {
+      if (regions[region]?.includes(currentPlace)) {
         currentRegion = regions[region];
       }
     }
@@ -117,7 +125,7 @@ class SudokuSolver {
 
       const indexOfPlace = placesMap[currentRegion[index]];
 
-      if (puzzleString[indexOfPlace] === value) {
+      if (puzzleString?.[indexOfPlace] === value) {
         isExistValueInRegion = true;
         break;
       }
