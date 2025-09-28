@@ -104,7 +104,6 @@ module.exports = function (app) {
     }
 
     const isSolver = solver.solve(puzzle);
-    console.log("isSolver", isSolver);
 
     if (!isSolver) {
       return res.json({ error: "Puzzle cannot be solved" });
